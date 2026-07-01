@@ -1,0 +1,10 @@
+[project]
+name = "detect-circle"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.5.0",
+    "opencv-python>=4.13.0.92",
+    "pygame>=2.6.1",
+]

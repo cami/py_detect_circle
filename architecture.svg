@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 900" font-family="sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333333"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a6d3b"/>
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6a3d9a"/>
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f7a8c"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1040" height="900" fill="#ffffff"/>
+
+  <text x="520" y="32" text-anchor="middle" font-size="22" font-weight="bold" fill="#1a1a1a">detect_circle システム構成図</text>
+
+  <!-- Legend -->
+  <line x1="60" y1="52" x2="100" y2="52" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="108" y="56" font-size="12.5" fill="#333333">データフロー</text>
+  <line x1="230" y1="52" x2="270" y2="52" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+  <text x="278" y="56" font-size="12.5" fill="#8a6d3b">config.py の設定値を参照</text>
+  <line x1="460" y1="52" x2="500" y2="52" stroke="#6a3d9a" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <text x="508" y="56" font-size="12.5" fill="#6a3d9a">キャリブレーション経路</text>
+  <line x1="680" y1="52" x2="720" y2="52" stroke="#1f7a8c" stroke-width="2" marker-end="url(#arrowTeal)"/>
+  <text x="728" y="56" font-size="12.5" fill="#1f7a8c">display.py / annotation.py 共通利用</text>
+
+  <!-- B1: camera hardware -->
+  <rect x="60" y="100" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="128" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a3a5c">カメラハードウェア</text>
+  <text x="260" y="148" text-anchor="middle" font-size="12.5" fill="#333333">USBカメラ (今回) / Picamera2用CSIカメラ (将来のRPi)</text>
+
+  <!-- display.py: shared pygame display -->
+  <rect x="620" y="100" width="360" height="70" rx="10" fill="#e6f4f6" stroke="#1f7a8c" stroke-width="1.5"/>
+  <text x="800" y="123" text-anchor="middle" font-size="14" font-weight="bold" fill="#155a67">display.py</text>
+  <text x="800" y="141" text-anchor="middle" font-size="11.5" font-family="monospace" fill="#155a67">PygameDisplay.show(frame) / poll_events()</text>
+  <text x="800" y="157" text-anchor="middle" font-size="10.5" fill="#1f7a8c">X11/Wayland不要。main.py・calibration.py共通</text>
+
+  <!-- B2: CameraSource -->
+  <rect x="60" y="220" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="245" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a3a5c">camera/base.py, usb_camera.py</text>
+  <text x="260" y="265" text-anchor="middle" font-size="12" font-family="monospace" fill="#333333">CameraSource.capture_frame() -&gt; BGRフレーム</text>
+  <text x="260" y="281" text-anchor="middle" font-size="11" fill="#666666">(RPi移植時はpicamera2_camera.pyを追加するだけで済む)</text>
+
+  <!-- B3: main loop -->
+  <rect x="60" y="340" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="368" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a3a5c">main.py</text>
+  <text x="260" y="388" text-anchor="middle" font-size="12.5" fill="#333333">常時キャプチャループ（配線役。検出/判定ロジックは持たない）</text>
+
+  <!-- B4: circle_detector -->
+  <rect x="60" y="460" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="485" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a3a5c">detection/circle_detector.py</text>
+  <text x="260" y="505" text-anchor="middle" font-size="12" font-family="monospace" fill="#333333">find_circle(frame) -&gt; Circle | None</text>
+  <text x="260" y="521" text-anchor="middle" font-size="11" fill="#666666">(グレースケール→二値化(両極性を試行)→輪郭の真円度で判定。純粋関数)</text>
+
+  <!-- B5: trigger -->
+  <rect x="60" y="580" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="605" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a3a5c">trigger.py</text>
+  <text x="260" y="625" text-anchor="middle" font-size="12" font-family="monospace" fill="#333333">TriggerStateMachine.step(circle) -&gt; bool</text>
+  <text x="260" y="641" text-anchor="middle" font-size="11" fill="#666666">(判定ゾーン進入とクールダウンを管理する唯一の状態保持クラス)</text>
+
+  <!-- B6: color_classifier -->
+  <rect x="60" y="700" width="400" height="70" rx="10" fill="#eef4fb" stroke="#4a76a8" stroke-width="1.5"/>
+  <text x="260" y="725" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a3a5c">detection/color_classifier.py</text>
+  <text x="260" y="745" text-anchor="middle" font-size="12" font-family="monospace" fill="#333333">classify(frame, circle) -&gt; Judgment, mean_hsv</text>
+  <text x="260" y="761" text-anchor="middle" font-size="11" fill="#666666">(円内マスクの平均HSVでOK/NG/Errorを判定。True時のみ実行)</text>
+
+  <!-- Output boxes -->
+  <rect x="50" y="820" width="130" height="60" rx="8" fill="#eafaf0" stroke="#3a9d5d" stroke-width="1.5"/>
+  <text x="115" y="845" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#245c39">コンソール出力</text>
+  <text x="115" y="862" text-anchor="middle" font-size="11" fill="#245c39">判定結果・HSV値</text>
+
+  <rect x="195" y="820" width="130" height="60" rx="8" fill="#eafaf0" stroke="#3a9d5d" stroke-width="1.5"/>
+  <text x="260" y="845" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#245c39">output/*.png</text>
+  <text x="260" y="862" text-anchor="middle" font-size="11" fill="#245c39">注釈付き画像を保存</text>
+
+  <rect x="340" y="820" width="130" height="60" rx="8" fill="#eafaf0" stroke="#3a9d5d" stroke-width="1.5"/>
+  <text x="405" y="845" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#245c39">プレビュー表示</text>
+  <text x="405" y="862" text-anchor="middle" font-size="11" fill="#245c39">display.py経由、480x320で表示</text>
+
+  <!-- Config box -->
+  <rect x="620" y="220" width="360" height="140" rx="10" fill="#fdf3e0" stroke="#c98a1f" stroke-width="1.5"/>
+  <text x="800" y="244" text-anchor="middle" font-size="14" font-weight="bold" fill="#8a6d3b">config.py</text>
+  <text x="800" y="264" text-anchor="middle" font-size="11.5" fill="#5c4a26">CAPTURE/DISPLAY 解像度</text>
+  <text x="800" y="282" text-anchor="middle" font-size="11.5" fill="#5c4a26">CIRCULARITY_THRESHOLD, 面積範囲</text>
+  <text x="800" y="300" text-anchor="middle" font-size="11.5" fill="#5c4a26">WHITE_* / ORANGE_* (HSV閾値)</text>
+  <text x="800" y="318" text-anchor="middle" font-size="11.5" fill="#5c4a26">JUDGE_ZONE, TRIGGER/EXIT_CONFIRM_FRAMES</text>
+  <text x="800" y="340" text-anchor="middle" font-size="11" fill="#8a6d3b">実機の照明・ベルト速度に合わせて調整する箇所</text>
+
+  <!-- Solid data-flow arrows (main pipeline) -->
+  <line x1="260" y1="170" x2="260" y2="220" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="198" font-size="11.5" fill="#333333">V4L2 / libcamera</text>
+
+  <line x1="260" y1="290" x2="260" y2="340" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="318" font-size="11.5" fill="#333333">capture_frame()</text>
+
+  <line x1="260" y1="410" x2="260" y2="460" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="438" font-size="11.5" fill="#333333">frame (BGR)</text>
+
+  <line x1="260" y1="530" x2="260" y2="580" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="558" font-size="11.5" fill="#333333">Circle | None</text>
+
+  <line x1="260" y1="650" x2="260" y2="700" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="678" font-size="11.5" fill="#333333">True の時のみ実行</text>
+  <text x="470" y="678" font-size="11" font-style="italic" fill="#777777">(False の場合はmain.pyが次フレームへ進む)</text>
+
+  <line x1="260" y1="770" x2="115" y2="820" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="260" y1="770" x2="260" y2="820" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="260" y1="770" x2="405" y2="820" stroke="#333333" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="270" y="795" font-size="11.5" fill="#333333">Judgment, mean_hsv</text>
+
+  <!-- Dashed config-reference arrows -->
+  <line x1="620" y1="255" x2="460" y2="255" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+  <line x1="620" y1="360" x2="460" y2="495" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+  <line x1="620" y1="360" x2="460" y2="615" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+  <line x1="620" y1="360" x2="460" y2="735" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+
+  <!-- Calibration mode section -->
+  <text x="800" y="435" text-anchor="middle" font-size="16" font-weight="bold" fill="#6a3d9a">キャリブレーションモード (calibration.py)</text>
+
+  <rect x="620" y="460" width="360" height="100" rx="10" fill="#f3ecfb" stroke="#6a3d9a" stroke-width="1.5"/>
+  <text x="800" y="485" text-anchor="middle" font-size="14" font-weight="bold" fill="#4b2472">calibration.py</text>
+  <text x="800" y="503" text-anchor="middle" font-size="12" fill="#4b2472">閾値調整用インタラクティブツール</text>
+  <text x="800" y="519" text-anchor="middle" font-size="11" font-family="monospace" fill="#4b2472">矢印キーでconfig値をライブ変更（pygame表示）</text>
+  <text x="800" y="537" text-anchor="middle" font-size="10.5" font-style="italic" fill="#6a3d9a">'s'キーで現在値を出力→手動でconfig.pyに反映</text>
+  <text x="800" y="553" text-anchor="middle" font-size="10.5" fill="#6a3d9a">(camera/usb_camera.py・display.py を直接使用)</text>
+
+  <rect x="620" y="580" width="360" height="70" rx="10" fill="#f3ecfb" stroke="#6a3d9a" stroke-width="1.5"/>
+  <text x="800" y="602" text-anchor="middle" font-size="13" font-weight="bold" fill="#4b2472">pygame プレビュー画面</text>
+  <text x="800" y="620" text-anchor="middle" font-size="11" fill="#4b2472">検出円・OK/NG/Error・現在値を文字で焼き込み表示</text>
+  <text x="800" y="636" text-anchor="middle" font-size="10" fill="#6a3d9a">(display.py経由。main.pyの本番表示と同じ仕組み)</text>
+
+  <!-- Calibration data-flow arrows (reuses the same production functions) -->
+  <line x1="620" y1="495" x2="460" y2="495" stroke="#6a3d9a" stroke-width="2" marker-end="url(#arrowPurple)"/>
+
+  <line x1="620" y1="530" x2="460" y2="735" stroke="#6a3d9a" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <text x="545" y="625" text-anchor="middle" font-size="10.5" fill="#6a3d9a">classify(frame, circle)</text>
+
+  <line x1="800" y1="560" x2="800" y2="580" stroke="#6a3d9a" stroke-width="2" marker-end="url(#arrowPurple)"/>
+
+  <line x1="800" y1="360" x2="800" y2="460" stroke="#8a6d3b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowGray)"/>
+  <text x="810" y="415" font-size="11" fill="#8a6d3b">初期値を読込み</text>
+
+  <!-- display.py used by both main.py and calibration.py (routed left of the config box) -->
+  <polyline points="620,120 580,120 580,375 460,375" fill="none" stroke="#1f7a8c" stroke-width="2" marker-end="url(#arrowTeal)"/>
+  <text x="486" y="358" text-anchor="middle" font-size="10.5" fill="#1f7a8c">show() / poll_events()</text>
+  <polyline points="620,150 600,150 600,510 620,510" fill="none" stroke="#1f7a8c" stroke-width="2" marker-end="url(#arrowTeal)"/>
+
+  <!-- annotation.py: shared drawing, used by both main.py and calibration.py -->
+  <rect x="620" y="700" width="360" height="70" rx="10" fill="#e6f4f6" stroke="#1f7a8c" stroke-width="1.5"/>
+  <text x="800" y="723" text-anchor="middle" font-size="14" font-weight="bold" fill="#155a67">annotation.py</text>
+  <text x="800" y="741" text-anchor="middle" font-size="11" font-family="monospace" fill="#155a67">draw_judgment(frame, circle, judgment)</text>
+  <text x="800" y="757" text-anchor="middle" font-size="10.5" fill="#1f7a8c">main.py・calibration.py共通（円+ラベルの描画）</text>
+
+  <polyline points="620,715 555,715 555,395 460,395" fill="none" stroke="#1f7a8c" stroke-width="2" marker-end="url(#arrowTeal)"/>
+  <polyline points="650,700 600,700 600,545 620,545" fill="none" stroke="#1f7a8c" stroke-width="2" marker-end="url(#arrowTeal)"/>
+</svg>

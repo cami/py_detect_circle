@@ -13,7 +13,7 @@
 [uv](https://docs.astral.sh/uv/) を使う。
 
 ```bash
-uv add opencv-python numpy pygame   # 初回のみ（既に追加済み）
+uv add opencv-python numpy pygame   # 初回のみ
 ```
 
 ## 使い方
@@ -23,7 +23,8 @@ uv add opencv-python numpy pygame   # 初回のみ（既に追加済み）
 uv run python main.py
 
 # キャリブレーション: Up/Down/Left/Rightキーで閾値を調整しながらライブプレビューで確認する
-# ('s'キーで現在値をconfig.py貼り付け用の形式で出力、'q'/Escキーで終了)
+# ('h'キーでヘルプ画面（各パラメータの説明・最小値・最大値・調整中の値・main.pyが実際に使っている値を表示。Escで戻る）
+#  's'キーで現在値をconfig.py貼り付け用の形式で出力、'q'/Escキーで終了)
 # pygame表示なのでX11/Waylandがなくても動く(RPiの本番と同じ表示方式)
 uv run python calibration.py
 ```

@@ -31,6 +31,20 @@ uv run python calibration.py
 
 判定結果はコンソール出力・`output/`への注釈付き画像保存・プレビューウィンドウ表示の3通りで確認できる。
 
+### ログを止めたいとき
+
+デフォルトでは起動時に libcamera の INFO ログ（`camera_manager` / `pipeline_base` / `IPAProxy` など）と
+pygame の起動バナーがコンソールに出る。起動オプション（環境変数）で抑制できる。
+
+```bash
+LIBCAMERA_LOG_LEVELS='*:ERROR' PYGAME_HIDE_SUPPORT_PROMPT=1 uv run python main.py
+```
+
+- `LIBCAMERA_LOG_LEVELS='*:ERROR'`: libcamera の INFO ログを抑制し、ERROR のみ表示する（`*:WARN` にすると WARN 以上を表示）
+- `PYGAME_HIDE_SUPPORT_PROMPT=1`: pygame の `Hello from the pygame community` バナーを抑制する
+
+判定結果の `print()`（`judgment=...` の行）はアプリ自体のログなので、これらのオプションでは消えない。
+
 ## ディレクトリ構成
 
 | パス | 役割 |

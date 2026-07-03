@@ -17,7 +17,7 @@ import pygame
 
 import config
 from annotation import draw_judgment
-from camera.usb_camera import UsbCameraSource
+from camera.factory import open_camera_source
 from detection.circle_detector import find_circle
 from detection.color_classifier import classify
 from display import PygameDisplay
@@ -131,7 +131,7 @@ def main() -> None:
     showing_help = False
     running = True
 
-    with UsbCameraSource() as camera:
+    with open_camera_source() as camera:
         print("Up/Downでパラメータ選択、Left/Rightで値を変更、'h'でヘルプ、"
               "'s'で現在値を出力、'q'/Escで終了します。")
         while running:

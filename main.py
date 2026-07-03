@@ -26,12 +26,6 @@ def _save_annotated(annotated) -> Path:
     return path
 
 
-def _show_preview(display: PygameDisplay, annotated) -> None:
-    """Resize to the physical display resolution before rendering."""
-    display_frame = cv2.resize(annotated, (config.DISPLAY_WIDTH, config.DISPLAY_HEIGHT))
-    display.show(display_frame)
-
-
 def main() -> None:
     display = PygameDisplay("detect_circle")
     # Open the window immediately (blank) so the quit key works even before the
@@ -78,13 +72,13 @@ def main() -> None:
                 annotated = draw_judgment(frame, circle, judgment)
                 saved_path = _save_annotated(annotated)
                 print(f"  saved: {saved_path}")
-                _show_preview(display, annotated)
+                display.show(annotated)
                 last_preview_time = now
                 hold_until = now + config.JUDGMENT_HOLD_SECONDS
             elif now >= hold_until and now - last_preview_time >= live_preview_interval:
                 # No judgment this frame and the previous judgment's hold period (if
                 # any) has elapsed: refresh with the live feed at LIVE_PREVIEW_FPS.
-                _show_preview(display, frame)
+                display.show(frame)
                 last_preview_time = now
 
             for event in display.poll_events():

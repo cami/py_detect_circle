@@ -54,6 +54,25 @@
 - calibration.py側のUIはトラックバーのような専用ウィジェットを使わず、パラメータ名と現在値をフレームに
   文字として焼き込み、矢印キーで選択・増減するだけの最小限の作りにしている（RPi上で凝ったGUIを構築する
   必要はないため）。
+- RPi実機にはHDMIなど他のDRM出力が存在しうるため、`display.py`の`_select_spi_display_driver()`が
+  `/sys/class/drm/card*-SPI-*`からSPI接続のDRMカードを探し、`SDL_VIDEODRIVER=kmsdrm`と対応する
+  `SDL_VIDEO_KMSDRM_DEVICE_INDEX`を設定してからpygameを初期化する。SDL_VIDEODRIVERが既に設定済み、
+  またはローカルX11/Wayland（SSH -X/-Y転送含む）が検出された場合は何もせず、明示的な設定やSSH越しの
+  開発用表示を上書きしない。`PygameDisplay.__init__`内で呼ぶことで、main.py/calibration.py双方に
+  自動的に適用される。
+  当初`DISPLAY`の判定を`.startswith(":")`（ローカルXの`:0`形式のみ）にしていたため、SSH -X/-Y転送時の
+  `host:10.0`形式を検出できず、`SDL_VIDEO_X11_FORCE_EGL=1`を指定してもkmsdrmに上書きされてしまう
+  不具合があった（実機での動作確認で発覚）。`DISPLAY`が空でなければ真とする判定に修正済み。
+  逆にSSH -X/-Y接続を維持したままSPI実機側の見た目を確認したい場合のために、`FORCE_SPI_DISPLAY`環境変数
+  でDISPLAY/WAYLAND_DISPLAYの判定を無視してSPI側を強制選択できるようにしている（`SDL_VIDEODRIVER`を
+  直接指定した場合はそちらが最優先されるのは変わらない）。
+- SPIパネルのDRMコネクタは`480x320`（`config.DISPLAY_WIDTH`/`DISPLAY_HEIGHT`）という1モードしか公開して
+  いない。以前は呼び出し側（main.py）が表示直前に`cv2.resize`でこのサイズに合わせていたが、
+  calibration.pyはカメラの生解像度（`CAPTURE_WIDTH`/`CAPTURE_HEIGHT`=640x480）のまま`display.show()`に
+  渡していたため、パネルが対応しないサイズで`pygame.display.set_mode()`が呼ばれ、コンソール
+  （ログインプロンプト）の内容と表示が競合してちらつく不具合が発生していた（実機での動作確認で発覚）。
+  呼び出し側がリサイズを忘れると再発するため、`PygameDisplay.show()`内でこの解像度に強制リサイズする
+  ようにし、main.py側の重複したリサイズ処理は削除した。
 
 ## 7. 描画ロジックも`annotation.py`に共有する
 
